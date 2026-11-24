@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="description" content="TRADING PRO: análisis técnico educativo para acciones españolas y estadounidenses.">
+<link rel="manifest" href="manifest.webmanifest">
+<title>TRADING PRO</title>
+<style>
+:root{color-scheme:dark;--bg:#080e19;--panel:#111b2b;--panel2:#172438;--line:#26364d;--muted:#91a3ba;--text:#eef4ff;--green:#2bd18b;--red:#ff6577;--amber:#f6c76b;--blue:#78aaff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% -10%,#183153 0,transparent 38%),var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{max-width:1180px;margin:auto;padding:20px 18px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-weight:850;letter-spacing:.12em;font-size:19px}.brand span{color:var(--blue)}.sub{color:var(--muted);font-size:12px;margin-top:3px}
+main{max-width:1180px;margin:auto;padding:8px 18px 48px}.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+button,.filelabel{background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:10px 13px;border-radius:11px;font-weight:650;cursor:pointer;font-size:13px}
+button.primary{background:#2358a2;border-color:#3976c8}button:hover,.filelabel:hover{filter:brightness(1.15)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}
+.card,.panel{background:linear-gradient(145deg,rgba(20,33,52,.98),rgba(13,22,36,.98));border:1px solid var(--line);border-radius:17px;padding:16px;min-width:0}
+.metric-label{color:var(--muted);font-size:12px}.metric{font-size:25px;font-weight:780;margin-top:7px;letter-spacing:-.03em}.metric-note{font-size:11px;color:var(--muted);margin-top:3px}
+.layout{display:grid;grid-template-columns:1.45fr .85fr;gap:12px;margin-top:12px}.panel h2{font-size:15px;margin:0 0 13px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}.controls input,.controls select{background:#0b1422;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px 12px;min-width:0}
+.controls input{flex:1;min-width:130px}.controls select{width:auto}
+.signal{border-radius:12px;padding:13px;margin:10px 0;background:#18283b;border:1px solid var(--line)}.signal.buy{border-color:#1f7657;background:#102c27}.signal.sell{border-color:#8d3949;background:#321b27}.signal.wait{border-color:#80632e;background:#302719}
+.signal strong{font-size:18px;letter-spacing:.04em}.green{color:var(--green)}.red{color:var(--red)}.amber{color:var(--amber)}
+.small{font-size:12px;color:var(--muted);line-height:1.5}.kv{display:grid;grid-template-columns:1fr auto;gap:9px;font-size:13px;padding:8px 0;border-bottom:1px solid rgba(38,54,77,.65)}.kv:last-child{border:0}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:10px 7px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:600}
+.empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px;font-size:13px}
+.notice{background:#241f15;border:1px solid #594a2b;color:#e9d5a4;padding:12px;border-radius:12px;font-size:12px;line-height:1.5;margin-top:12px}
+footer{color:var(--muted);font-size:11px;line-height:1.6;margin:16px 2px}
+#file{display:none}.pill{font-size:10px;color:#b9c9df;border:1px solid var(--line);border-radius:20px;padding:5px 8px}
+@media(max-width:760px){header{align-items:flex-start}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}.metric{font-size:22px}main{padding-inline:12px}header{padding-inline:12px}.top-actions button{padding:9px 10px}}
+@media(min-width:761px){.watch-panel{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header>
+ <div><div class="brand">TRADING <span>PRO</span></div><div class="sub">CENTRO DE ANÁLISIS · ACCIONES ES / EE. UU.</div></div>
+ <div class="top-actions"><button id="notifyBtn">Activar avisos</button><button id="installBtn" class="primary" hidden>Instalar app</button></div>
+</header>
+<main>
+ <div class="grid">
+  <div class="card"><div class="metric-label">Capital de referencia</div><div class="metric" id="capitalMetric">1.000 €</div><div class="metric-note">Capital editable en ajustes</div></div>
+  <div class="card"><div class="metric-label">Riesgo máximo / operación</div><div class="metric" id="riskMetric">10 €</div><div class="metric-note">1% del capital configurado</div></div>
+  <div class="card"><div class="metric-label">Activo analizado</div><div class="metric" id="assetMetric">—</div><div class="metric-note" id="dateMetric">Importa un CSV diario</div></div>
+  <div class="card"><div class="metric-label">Estado del análisis</div><div class="metric" id="statusMetric">Esperando datos</div><div class="metric-note">Sin órdenes automáticas</div></div>
+ </div>
+ <section class="panel">
+  <div class="row"><h2>Analizar una acción</h2><span class="pill">Datos diarios OHLCV</span></div>
+  <div class="controls">
+   <input id="ticker" value="SAN.MC" aria-label="Símbolo" placeholder="Ej. SAN.MC, AAPL">
+   <select id="currency"><option value="EUR">EUR</option><option value="USD">USD</option></select>
+   <label class="filelabel" for="file">Importar CSV</label><input id="file" type="file" accept=".csv,text/csv">
+   <button id="demoBtn">Cargar demo</button>
+  </div>
+  <div class="small">Sube un CSV histórico con columnas Date, Open, High, Low, Close y Volume (por ejemplo, exportado desde Yahoo Finance). La aplicación calcula indicadores localmente en tu dispositivo.</div>
+ </section>
+ <div class="layout">
+  <section class="panel">
+   <h2>Resultado de la estrategia</h2>
+   <div id="emptyState" class="empty">Todavía no hay datos. Importa un CSV para calcular la señal.</div>
+   <div id="result" hidden>
+    <div id="signalBox" class="signal wait"><div class="small">SEÑAL TÉCNICA</div><strong id="signalText">ESPERAR</strong><div class="small" id="reasonText"></div></div>
+    <div class="kv"><span>Último cierre</span><b id="priceVal">—</b></div>
+    <div class="kv"><span>RSI (14)</span><b id="rsiVal">—</b></div>
+    <div class="kv"><span>EMA 20 / EMA 50</span><b id="emaVal">—</b></div>
+    <div class="kv"><span>MACD / señal</span><b id="macdVal">—</b></div>
+    <div class="kv"><span>ATR (14)</span><b id="atrVal">—</b></div>
+   </div>
+  </section>
+  <section class="panel">
+   <h2>Plan de riesgo orientativo</h2>
+   <div id="riskEmpty" class="empty">Se calculará al importar datos.</div>
+   <div id="riskResult" hidden>
+    <div class="kv"><span>Stop orientativo (2 × ATR)</span><b id="stopVal">—</b></div>
+    <div class="kv"><span>Objetivo orientativo (4 × ATR)</span><b id="targetVal">—</b></div>
+    <div class="kv"><span>Acciones máximas estimadas</span><b id="sharesVal">—</b></div>
+    <div class="kv"><span>Inversión estimada</span><b id="investVal">—</b></div>
+    <div class="kv"><span>Riesgo estimado hasta stop</span><b id="lossVal">—</b></div>
+    <div class="controls"><input id="capitalInput" type="number" min="100" step="100" value="1000" aria-label="Capital en euros"><button id="capitalBtn">Actualizar capital (€)</button></div>
+    <div class="small">Límite de inversión configurado: 20% del capital por valor. No incluye comisiones, impuestos ni conversión EUR/USD.</div>
+   </div>
+  </section>
+  <section class="panel watch-panel">
+   <div class="row"><h2>Lista de seguimiento</h2><span class="pill">En este dispositivo</span></div>
+   <div class="controls"><input id="watchTicker" placeholder="Añadir símbolo, ej. NVDA"><button id="addWatch">Añadir</button></div>
+   <div id="watchList" class="empty">Añade símbolos que quieras vigilar. Para analizarlos, importa su CSV.</div>
+  </section>
+ </div>
+ <div class="notice"><b>Importante:</b> esta versión no obtiene cotizaciones en directo ni envía avisos remotos cuando está cerrada. Las notificaciones del navegador funcionan cuando la aplicación está abierta y se concede permiso. Para avisos push 24/7 hace falta alojarla por HTTPS y configurar un servidor de notificaciones. No conecta con bróker ni ejecuta compras o ventas.</div>
+ <footer>TRADING PRO es una herramienta educativa, no asesoramiento financiero. Las señales se basan en datos históricos y pueden fallar. Prueba primero con una cartera simulada. Las acciones estadounidenses cotizan en USD; el cálculo del tamaño de posición debe ajustarse al tipo de cambio y a las comisiones de tu bróker.</footer>
+</main>
+<script>
+let capital=1000, lastSignal=null, deferredPrompt=null, current=null;
+const $=id=>document.getElementById(id);
+const money=(n,c='EUR')=>Number.isFinite(n)?new Intl.NumberFormat('es-ES',{style:'currency',currency:c,maximumFractionDigits:2}).format(n):'—';
+function ema(values,period){let k=2/(period+1),out=[],v=values[0];values.forEach((x,i)=>{v=i===0?x:x*k+v*(1-k);out.push(v)});return out}
+function calcRsi(values,p=14){let out=Array(values.length).fill(null),g=0,l=0;for(let i=1;i<values.length;i++){let d=values[i]-values[i-1];if(i<=p){g+=Math.max(d,0);l+=Math.max(-d,0);if(i===p){g/=p;l/=p}}else{g=(g*(p-1)+Math.max(d,0))/p;l=(l*(p-1)+Math.max(-d,0))/p}if(i>=p)out[i]=l===0?100:100-100/(1+g/l)}return out}
+function parseCSV(text){let lines=text.trim().split(/\r?\n/);if(lines.length<60)throw Error('El CSV necesita al menos 60 filas de datos diarios.');let headers=lines[0].split(',').map(x=>x.replace(/^"|"$/g,'').trim().toLowerCase());let idx=k=>headers.findIndex(h=>h===k.toLowerCase());let keys=['date','open','high','low','close','volume'];let ix=Object.fromEntries(keys.map(k=>[k,idx(k)]));if(keys.some(k=>ix[k]<0))throw Error('Faltan columnas. Se requieren Date, Open, High, Low, Close y Volume.');let rows=lines.slice(1).map(line=>{let a=line.split(',').map(x=>x.replace(/^"|"$/g,'').trim());return {date:a[ix.date],open:+a[ix.open],high:+a[ix.high],low:+a[ix.low],close:+a[ix.close],volume:+a[ix.volume]}}).filter(r=>[r.open,r.high,r.low,r.close,r.volume].every(Number.isFinite));if(rows.length<60)throw Error('No hay 60 filas válidas. Revisa el CSV.');return rows}
+function analyze(rows,ticker,currency){let c=rows.map(r=>r.close),e20=ema(c,20),e50=ema(c,50),rsi=calcRsi(c);let m12=ema(c,12),m26=ema(c,26),macd=c.map((_,i)=>m12[i]-m26[i]),sig=ema(macd,9);let trs=rows.map((r,i)=>Math.max(r.high-r.low,Math.abs(r.high-(i?c[i-1]:r.close)),Math.abs(r.low-(i?c[i-1]:r.close))));let atr=trs.slice(-14).reduce((a,b)=>a+b,0)/14;let i=c.length-1,prev=i-1;let up=c[i]>e50[i]&&e20[i]>e50[i],down=c[i]<e50[i]&&e20[i]<e50[i],buy=up&&macd[i]>sig[i]&&rsi[i]>=45&&rsi[i]<=68,sell=down||(macd[prev]>=sig[prev]&&macd[i]<sig[i]&&rsi[i]>=50);let signal=buy?'COMPRAR':sell?'VENDER':'MANTENER / ESPERAR';let reason=buy?'Tendencia alcista y momentum confirmado; RSI en zona moderada.':sell?'Debilitamiento de tendencia o cruce bajista del MACD.':'No hay una combinación suficientemente clara para una entrada o salida.';return {ticker,currency,date:rows[i].date,price:c[i],rsi:rsi[i],e20:e20[i],e50:e50[i],macd:macd[i],sig:sig[i],atr,signal,reason}}
+function render(a){current=a;$('emptyState').hidden=true;$('result').hidden=false;$('riskEmpty').hidden=true;$('riskResult').hidden=false;$('assetMetric').textContent=a.ticker;$('dateMetric').textContent='Última fila: '+a.date;$('statusMetric').textContent=a.signal;$('signalText').textContent=a.signal;$('reasonText').textContent=a.reason;$('signalBox').className='signal '+(a.signal==='COMPRAR'?'buy':a.signal==='VENDER'?'sell':'wait');$('signalText').className=a.signal==='COMPRAR'?'green':a.signal==='VENDER'?'red':'amber';$('priceVal').textContent=money(a.price,a.currency);$('rsiVal').textContent=a.rsi.toFixed(1);$('emaVal').textContent=a.e20.toFixed(2)+' / '+a.e50.toFixed(2);$('macdVal').textContent=a.macd.toFixed(4)+' / '+a.sig.toFixed(4);$('atrVal').textContent=a.atr.toFixed(3);let stop=Math.max(0,a.price-2*a.atr),target=a.price+4*a.atr,risk=Math.max(a.price-stop,.01),shares=Math.max(0,Math.min(Math.floor((capital*.01)/risk),Math.floor((capital*.2)/a.price)));$('stopVal').textContent=money(stop,a.currency);$('targetVal').textContent=money(target,a.currency);$('sharesVal').textContent=shares;$('investVal').textContent=money(shares*a.price,a.currency);$('lossVal').textContent=money(shares*risk,a.currency);if(lastSignal&&lastSignal!==a.signal&&['COMPRAR','VENDER'].includes(a.signal))notify(a.ticker,a.signal);lastSignal=a.signal}
+function notify(t,s){if('Notification'in window&&Notification.permission==='granted'){navigator.serviceWorker?.ready.then(reg=>reg.showNotification('TRADING PRO · '+s,{body:'Nueva señal técnica para '+t,icon:'icon.svg'})).catch(()=>new Notification('TRADING PRO · '+s,{body:'Nueva señal técnica para '+t}))}}
+$('file').addEventListener('change',async e=>{let f=e.target.files[0];if(!f)return;try{let rows=parseCSV(await f.text()),ticker=$('ticker').value.trim().toUpperCase()||'ACCIÓN',cur=$('currency').value;render(analyze(rows,ticker,cur));}catch(err){alert(err.message)}e.target.value=''});
+$('notifyBtn').onclick=async()=>{if(!('Notification'in window)){alert('Este navegador no admite notificaciones.');return}let p=await Notification.requestPermission();$('notifyBtn').textContent=p==='granted'?'Avisos activados':'Activar avisos'};
+$('capitalBtn').onclick=()=>{let n=+$('capitalInput').value;if(n<100||!Number.isFinite(n)){alert('Introduce un capital válido (mínimo 100 €).');return}capital=n;$('capitalMetric').textContent=money(capital);$('riskMetric').textContent=money(capital*.01);if(current)render(current)};
+let watch=JSON.parse(localStorage.getItem('tradingWatch')||'[]');function drawWatch(){$('watchList').className=watch.length?'':'empty';$('watchList').innerHTML=watch.length?'<table><thead><tr><th>SÍMBOLO</th><th>ESTADO</th><th></th></tr></thead><tbody>'+watch.map((t,i)=>`<tr><td>${t}</td><td class="small">Pendiente de CSV</td><td><button data-remove="${i}">Quitar</button></td></tr>`).join('')+'</tbody></table>':'Añade símbolos que quieras vigilar. Para analizarlos, importa su CSV.';$('watchList').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{watch.splice(+b.dataset.remove,1);saveWatch()})}function saveWatch(){localStorage.setItem('tradingWatch',JSON.stringify(watch));drawWatch()}$('addWatch').onclick=()=>{let t=$('watchTicker').value.trim().toUpperCase();if(t&&!watch.includes(t)){watch.push(t);saveWatch()}$('watchTicker').value=''};drawWatch();
+$('demoBtn').onclick=()=>{let rows=[],p=100;for(let i=0;i<100;i++){p*=1+(Math.sin(i/7)*.003+.001);let o=p*(1-.002),h=p*1.01,l=p*.99;rows.push({date:'DEMO-'+(i+1),open:o,high:h,low:l,close:p,volume:100000+i*100})}render(analyze(rows,'DEMO', $('currency').value));$('dateMetric').textContent='Datos ficticios de demostración';};
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBtn').hidden=false});$('installBtn').onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$('installBtn').hidden=true};
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+$('capitalMetric').textContent=money(capital);$('riskMetric').textContent=money(capital*.01);
+</script>
+</body></html>
